@@ -25,10 +25,10 @@ export default function AddPage() {
     // TODO: Implement backend integration
   };
 
-  const handleLanjutScoring = () => {
-    console.log("Lanjut ke Scoring");
-    // TODO: Navigate to scoring page
-  };
+  // const handleLanjutScoring = () => {
+  //   console.log("Lanjut ke Scoring");
+  //   // TODO: Navigate to scoring page
+  // };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-cyan-400 via-cyan-500 to-cyan-600 flex items-center justify-center p-4 relative overflow-hidden">
@@ -153,13 +153,13 @@ export default function AddPage() {
               Simpan
             </button>
 
-            <button
+            {/* <button
               type="button"
               onClick={handleLanjutScoring}
               className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
             >
               Lanjut ke Scoring
-            </button>
+            </button> */}
           </div>
         </form>
       </div>

@@ -54,7 +54,7 @@ export default function ScorePage() {
     setScoringResult({
       totalScore: 48.74,
       riskLevel: "HIGH RISK",
-      riskCategory: "HIGH",
+      // riskCategory: "HIGH",
     });
     console.log("Menghitung skor dengan data:", formData);
 
@@ -692,9 +692,9 @@ export default function ScorePage() {
                     <span className="text-xl font-bold text-red-700">
                       {scoringResult.riskLevel}
                     </span>
-                    <span className="ml-3 px-3 py-1 bg-red-600 text-white text-sm rounded-full">
+                    {/* <span className="ml-3 px-3 py-1 bg-red-600 text-white text-sm rounded-full">
                       {scoringResult.riskCategory}
-                    </span>
+                    </span> */}
                   </div>
                 </div>
               </div>
