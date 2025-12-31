@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-export default function CreatePersonalInformationPage() {
+export default function AddPage() {
   const [formData, setFormData] = useState({
+    // No Aplikasi handle di server
     kodePos: "",
     tanggalLahir: "",
     nama: "",
