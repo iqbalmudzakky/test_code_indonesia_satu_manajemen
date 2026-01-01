@@ -1,8 +1,11 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { apiClient } from "../helpers/api";
 
 export default function ScorePage() {
+  const { noAplikasi } = useParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     // Informasi 1
     umurPemohon: "",
@@ -38,8 +41,32 @@ export default function ScorePage() {
     tujuanPembiayaan: "",
     ltv: "",
   });
+  console.log("🚀 ~ ScorePage ~ formData:", formData);
+  const [loading, setLoading] = useState(false);
+  const [loadingScore, setLoadingScore] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [scoringResult, setScoringResult] = useState(null);
+  useEffect(() => {
+    const fetchUserData = async (noAplikasi) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await apiClient.get(`/user/${noAplikasi}`);
+        setFormData(response.data.data);
+      } catch (err) {
+        console.log("🚀 ~ fetchUserData ~ err:", err);
+        if (err.response && err.response.status === 404) {
+          setError("Data user tidak ditemukan.");
+        } else {
+          setError("Gagal memuat data user.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData(noAplikasi);
+  }, [noAplikasi]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,44 +77,28 @@ export default function ScorePage() {
   };
 
   const handleHitungSkor = () => {
-    // TODO: Implement scoring calculation
-    setScoringResult({
-      totalScore: 48.74,
-      riskLevel: "HIGH RISK",
-      // riskCategory: "HIGH",
-    });
-    console.log("Menghitung skor dengan data:", formData);
-
-    // Contoh hasil form scoring
-    let A = {
-      alamat: "Tidak Sesuai",
-      appraisal: "Tidak Direkomendasikan",
-      dsr: "> 50%",
-      jabatan: "Staff",
-      kategoriPerusahaan: "Lembaga Departemen",
-      kepemilikan: "Lain-lain",
-      kepemilikanKartuKredit: "Tidak Ada",
-      lamaBekerja: "<= 2 Tahun",
-      lamaMenempati: "<= 2 tahun",
-      ltv: "LTV > 90%",
-      luasBangunan: "> 200 M2",
-      pendapatan: "<= Rp 10 juta",
-      pendidikan: "SMA atau dibawahnya",
-      rekeningBank: "Tidak Ada",
-      saldo: "< Rp 10 juta",
-      slik: "Kolektibilitas 3 sd 5",
-      statusPerkawinan: "Belum Kawin dengan > 2 tanggungan",
-      tenor: "> 15 Tahun",
-      trackRecordPembayaranAngsuran: "Peminjam Baru",
-      tujuanPembiayaan: "Lain-lain",
-      umurPemohon: "56 - 65 Tahun",
-      umurPemohonTenor: "Diatas Ketentuan",
-    };
+    setLoadingScore(true);
   };
 
   const handleKembali = () => {
     navigate("/");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center py-10 text-gray-600">Memuat data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center py-10 text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -97,7 +108,9 @@ export default function ScorePage() {
           <h1 className="text-3xl font-bold text-blue-600 mb-2">
             Scoring (DataRating)
           </h1>
-          <p className="text-gray-600">InformasiAplikasiId: 38</p>
+          <p className="text-gray-600">
+            InformasiAplikasiId: {formData.noAplikasi}
+          </p>
         </div>
 
         {/* Main Form Container */}
@@ -649,13 +662,23 @@ export default function ScorePage() {
 
           {/* Action Buttons */}
           <div className="flex gap-4 mb-6">
-            <button
-              type="button"
-              onClick={handleHitungSkor}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
-            >
-              Hitung Skor
-            </button>
+            {loadingScore ? (
+              <button
+                type="button"
+                disabled
+                className="bg-blue-400 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md cursor-not-allowed"
+              >
+                Memproses...
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleHitungSkor}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
+              >
+                Hitung Skor
+              </button>
+            )}
 
             <button
               type="button"
@@ -667,39 +690,38 @@ export default function ScorePage() {
           </div>
 
           {/* Scoring Result */}
-          {scoringResult && (
-            <div className="border-t-2 border-gray-200 pt-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">
-                Hasil Scoring
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Total Score
-                  </label>
-                  <div className="bg-gray-100 px-4 py-3 rounded-md">
-                    <span className="text-2xl font-bold text-gray-800">
-                      {scoringResult.totalScore}
-                    </span>
+          {formData.scoringResult &&
+            formData.scoringResult.summaryScore &&
+            formData.scoringResult.riskLevel && (
+              <div className="border-t-2 border-gray-200 pt-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  Hasil Scoring
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Total Score
+                    </label>
+                    <div className="bg-gray-100 px-4 py-3 rounded-md">
+                      <span className="text-2xl font-bold text-gray-800">
+                        {formData.scoringResult.summaryScore}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Risk Level
-                  </label>
-                  <div className="bg-red-100 px-4 py-3 rounded-md">
-                    <span className="text-xl font-bold text-red-700">
-                      {scoringResult.riskLevel}
-                    </span>
-                    {/* <span className="ml-3 px-3 py-1 bg-red-600 text-white text-sm rounded-full">
-                      {scoringResult.riskCategory}
-                    </span> */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Risk Level
+                    </label>
+                    <div className="bg-red-100 px-4 py-3 rounded-md">
+                      <span className="text-xl font-bold text-red-700">
+                        {formData.scoringResult.riskLevel}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </div>

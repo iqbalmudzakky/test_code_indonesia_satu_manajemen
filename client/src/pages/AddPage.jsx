@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { apiClient } from "../helpers/api";
 
 export default function AddPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     kodePos: "",
     tanggalLahir: "",
@@ -9,6 +12,8 @@ export default function AddPage() {
     tempatLahir: "",
     alamat: "",
   });
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,15 +23,38 @@ export default function AddPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    // TODO: Implement backend integration
-  };
+    setLoading(true);
+    setError(null);
 
-  const handleLanjutScoring = () => {
-    console.log("Lanjut ke Scoring");
-    // TODO: Navigate to scoring page
+    try {
+      // validasi untuk memastikan semua field terisi
+      for (const key in formData) {
+        if (formData[key].trim() === "") {
+          throw { status: 400, message: `Semua field harus diisi.` };
+        }
+      }
+
+      await apiClient.post("/add-user", formData);
+      navigate("/");
+    } catch (err) {
+      console.log("🚀 ~ handleSubmit ~ err:", err);
+      if (err.status === 400) {
+        // handle error 400 dari server
+        if (err.response && err.response.data && err.response.data.error) {
+          setError(err.response.data.error);
+          return;
+        }
+
+        // error custom dari validasi client
+        setError(err.message);
+      } else {
+        setError("Terjadi kesalahan pada server. Silakan coba lagi.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,6 +76,12 @@ export default function AddPage() {
         <h1 className="text-2xl font-bold text-center text-blue-600 mb-8">
           Formulir Informasi Aplikasi
         </h1>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Row 1: Nama and Jenis Kelamin */}
@@ -145,20 +179,30 @@ export default function AddPage() {
 
           {/* Buttons */}
           <div className="flex gap-4 pt-2">
-            <button
-              type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
-            >
-              Simpan
-            </button>
-
-            <button
-              type="button"
-              onClick={handleLanjutScoring}
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
-            >
-              Lanjut ke Scoring
-            </button>
+            {loading ? (
+              <button
+                type="button"
+                className="flex-1 bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md cursor-not-allowed"
+                disabled
+              >
+                Memproses...
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
+              >
+                Simpan
+              </button>
+            )}
+            <div className="flex-1">
+              <Link
+                to="/"
+                className="block text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
+              >
+                Batal
+              </Link>
+            </div>
           </div>
         </form>
       </div>

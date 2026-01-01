@@ -7,10 +7,38 @@ module.exports = class UserDetailModel {
   }
 
   static async getUserByNoAplikasi(noAplikasi) {
+    const agg = [
+      {
+        $match: { noAplikasi: Number(noAplikasi) },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "scoringResult",
+        },
+      },
+      {
+        $unwind: {
+          path: "$scoringResult",
+        },
+      },
+      {
+        $project: {
+          "scoringResult._id": false,
+          "scoringResult.nama": false,
+          "scoringResult.tempatLahir": false,
+          "scoringResult.tanggalLahir": false,
+          "scoringResult.jenisKelamin": false,
+          "scoringResult.alamat": false,
+          "scoringResult.kodePos": false,
+          "scoringResult.noAplikasi": false,
+        },
+      },
+    ];
     const collection = this.getCollection();
-    const userDetail = await collection.findOne({
-      noAplikasi: Number(noAplikasi),
-    });
+    const userDetail = await collection.aggregate(agg).next();
     return userDetail;
   }
 
