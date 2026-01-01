@@ -6,6 +6,14 @@ module.exports = class UserDetailModel {
     return db.collection("user_details");
   }
 
+  static async getUserByNoAplikasi(noAplikasi) {
+    const collection = this.getCollection();
+    const userDetail = await collection.findOne({
+      noAplikasi: Number(noAplikasi),
+    });
+    return userDetail;
+  }
+
   static async addUserDetailById(userId, noAplikasi) {
     const collection = this.getCollection();
 
@@ -36,6 +44,25 @@ module.exports = class UserDetailModel {
       umurPemohonTenor: "",
     };
     const result = await collection.insertOne(userDetailData);
+    return result;
+  }
+
+  static async updateUserDetailByNoAplikasi(noAplikasi, updateData) {
+    const collection = this.getCollection();
+    const result = await collection.updateOne(
+      { noAplikasi: Number(noAplikasi) },
+      {
+        $set: updateData,
+      }
+    );
+    return result;
+  }
+
+  static async deleteUserDetailByNoAplikasi(noAplikasi) {
+    const collection = this.getCollection();
+    const result = await collection.deleteOne({
+      noAplikasi: Number(noAplikasi),
+    });
     return result;
   }
 };

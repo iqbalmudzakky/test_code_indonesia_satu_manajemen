@@ -5,9 +5,21 @@ module.exports = class UserModel {
     return db.collection("users");
   }
 
+  static async getAllUsers() {
+    const collection = this.getCollection();
+    const users = await collection.find().toArray();
+    return users;
+  }
+
   static async getUserByNama(nama) {
     const collection = this.getCollection();
     const user = await collection.findOne({ nama });
+    return user;
+  }
+
+  static async getUserByNoAplikasi(noAplikasi) {
+    const collection = this.getCollection();
+    const user = await collection.findOne({ noAplikasi: Number(noAplikasi) });
     return user;
   }
 
@@ -37,5 +49,27 @@ module.exports = class UserModel {
     const result = await collection.insertOne(userData);
     // kembalikan id dan noAplikasi
     return { id: result.insertedId, noAplikasi };
+  }
+
+  static async updateUserByNoAplikasi(noAplikasi, summaryScore, riskLevel) {
+    const collection = this.getCollection();
+    const result = await collection.updateOne(
+      { noAplikasi: Number(noAplikasi) },
+      {
+        $set: {
+          summaryScore,
+          riskLevel,
+        },
+      }
+    );
+    return result;
+  }
+
+  static async deleteUserByNoAplikasi(noAplikasi) {
+    const collection = this.getCollection();
+    const result = await collection.deleteOne({
+      noAplikasi: Number(noAplikasi),
+    });
+    return result;
   }
 };
