@@ -27,7 +27,7 @@ module.exports = class UserModel {
       .limit(1)
       .toArray();
     const noAplikasi = user.length > 0 ? user[0].noAplikasi + 1 : 1;
-    const summaryScore = 0;
+    const summaryScore = "";
     const riskLevel = "";
 
     userData.noAplikasi = noAplikasi;

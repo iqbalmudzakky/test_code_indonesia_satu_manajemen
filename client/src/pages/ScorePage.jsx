@@ -518,10 +518,10 @@ export default function ScorePage() {
                     Pilih
                   </option>
                   <option value="> 15 Tahun">Lebih dari 15 Tahun</option>
-                  <option value=">10 - 15 Tahun">
+                  <option value="> 10 - 15 Tahun">
                     Lebih dari 10 Tahun sampai 15 Tahun
                   </option>
-                  <option value=">5 - 10 Tahun">
+                  <option value="> 5 - 10 Tahun">
                     Lebih dari 5 Tahun sampai 10 Tahun
                   </option>
                   <option value="<= 5 Tahun">5 Tahun atau kurang</option>
@@ -589,14 +589,14 @@ export default function ScorePage() {
                   <option disabled value="">
                     Pilih
                   </option>
-                  <option value="> 200 M2">Lebih dari 200 M2</option>
-                  <option value="> 100 - 200 M2">
-                    Lebih dari 100 M2 sampai 200 M2
+                  <option value="> 200 m2">Lebih dari 200 m2</option>
+                  <option value="> 100 - 200 m2">
+                    Lebih dari 100 m2 sampai 200 m2
                   </option>
-                  <option value="> 45 - 100 M2">
-                    Lebih dari 45 M2 sampai 100 M2
+                  <option value="> 45 - 100 m2">
+                    Lebih dari 45 m2 sampai 100 m2
                   </option>
-                  <option value="<= 45 M2">45 M2 atau kurang</option>
+                  <option value="<= 45 m2">45 m2 atau kurang</option>
                 </select>
               </div>
 

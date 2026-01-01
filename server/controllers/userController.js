@@ -1,6 +1,9 @@
 const handleInfo1 = require("../helpers/handleInfo1");
 const handleInfo2 = require("../helpers/handleInfo2");
 const handleInfo3 = require("../helpers/handleInfo3");
+const handleInfo4 = require("../helpers/handleInfo4");
+const handleInfo5 = require("../helpers/handleInfo5");
+const handleInfo6 = require("../helpers/handleInfo6");
 const UserDetailModel = require("../models/UserDetailModel");
 const UserModel = require("../models/UserModel");
 
@@ -82,6 +85,23 @@ module.exports = class UserController {
       jabatan,
       lamaBekerja,
       pendapatan
+    );
+
+    const resInfo4 = handleInfo4(
+      rekeningBank,
+      saldo,
+      trackRecordPembayaranAngsuran,
+      slik,
+      kepemilikanKartuKredit
+    );
+
+    const resInfo5 = handleInfo5(tenor, dsr);
+
+    const resInfo6 = handleInfo6(
+      appraisal,
+      tujuanPembiayaan,
+      ltv,
+      luasBangunan
     );
   }
 };
