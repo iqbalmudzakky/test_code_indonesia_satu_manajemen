@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.post("/login", UserController.login);
 // app.get("/users", UserController.getAllUsers);
 app.post("/add-user", UserController.addUser);
-// app.put("/update-user/:id", UserController.updateUser);
+app.put("/update-user/:noAplikasi", UserController.updateUserDetail);
 // app.delete("/delete-user/:id", UserController.deleteUser);
 
 module.exports = app;

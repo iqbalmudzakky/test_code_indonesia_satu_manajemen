@@ -35,6 +35,7 @@ module.exports = class UserModel {
     userData.riskLevel = riskLevel;
 
     const result = await collection.insertOne(userData);
-    return result;
+    // kembalikan id dan noAplikasi
+    return { id: result.insertedId, noAplikasi };
   }
 };
