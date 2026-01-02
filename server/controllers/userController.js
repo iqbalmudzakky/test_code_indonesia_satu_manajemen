@@ -235,7 +235,9 @@ module.exports = class UserController {
       } else if (err.status === 404) {
         res.status(404).json({ error: err.message });
       } else {
-        res.status(500).json({ error: "Internal Server Error" });
+        res
+          .status(500)
+          .json({ error: "Terjadi kesalahan pada server. Silakan coba lagi." });
       }
     }
   }

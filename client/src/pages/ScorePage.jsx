@@ -41,10 +41,10 @@ export default function ScorePage() {
     tujuanPembiayaan: "",
     ltv: "",
   });
-  console.log("🚀 ~ ScorePage ~ formData:", formData);
   const [loading, setLoading] = useState(false);
   const [loadingScore, setLoadingScore] = useState(false);
   const [error, setError] = useState(null);
+  const [errorForm, setErrorForm] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async (noAplikasi) => {
@@ -76,8 +76,49 @@ export default function ScorePage() {
     }));
   };
 
-  const handleHitungSkor = () => {
+  const handleHitungSkor = async () => {
     setLoadingScore(true);
+    setErrorForm(null);
+    try {
+      // validasi form, tidak boleh ada yang kosong
+      for (const key in formData) {
+        if (
+          formData[key] === "" &&
+          key !== "scoringResult" &&
+          key !== "noAplikasi"
+        ) {
+          throw {
+            status: 400,
+            message: "Semua field harus diisi sebelum menghitung skor.",
+          };
+        }
+      }
+
+      // update ke database
+      await apiClient.put(`/update-user/${noAplikasi}`, formData);
+
+      // refetch data user setelah update
+      const response = await apiClient.get(`/user/${noAplikasi}`);
+      setFormData(response.data.data);
+    } catch (err) {
+      console.log("🚀 ~ handleHitungSkor ~ err:", err);
+      if (err.status === 400) {
+        if (err.response && err.response.data && err.response.data.error) {
+          setErrorForm(err.response.data.error);
+          return;
+        }
+
+        // set error validasi client
+        setErrorForm(err.message);
+      } else {
+        setErrorForm(
+          err.response.data.error ||
+            "Terjadi kesalahan pada server. Silakan coba lagi."
+        );
+      }
+    } finally {
+      setLoadingScore(false);
+    }
   };
 
   const handleKembali = () => {
@@ -109,9 +150,16 @@ export default function ScorePage() {
             Scoring (DataRating)
           </h1>
           <p className="text-gray-600">
-            InformasiAplikasiId: {formData.noAplikasi}
+            Informasi Aplikasi Id: {formData.noAplikasi}
           </p>
         </div>
+
+        {/* Error Form */}
+        {errorForm && (
+          <div className="bg-red-100 text-red-700 p-4 rounded mb-6">
+            {errorForm}
+          </div>
+        )}
 
         {/* Main Form Container */}
         <div className="bg-white rounded-lg shadow-sm p-6">
