@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { FiUser, FiLock, FiLogIn } from "react-icons/fi";
+import { apiClient } from "../helpers/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -8,6 +9,8 @@ export default function LoginPage() {
     username: "",
     password: "",
   });
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,12 +20,42 @@ export default function LoginPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Prototype - just navigate to home page
-    console.log("Login Data:", formData);
-    alert("Login berhasil! (Prototype)");
-    navigate("/");
+    setLoading(true);
+    setError(null);
+    try {
+      // validasi semua field terisi
+      for (const key in formData) {
+        if (formData[key].trim() === "") {
+          throw { status: 400, message: `Semua field harus diisi.` };
+        }
+      }
+
+      const response = await apiClient.post("/login", formData);
+      const { token } = response.data;
+
+      // simpan token ke localStorage dan redirect ke halaman home
+      localStorage.setItem("authToken", token);
+      navigate("/");
+    } catch (err) {
+      console.log("🚀 ~ handleSubmit ~ err:", err);
+      if (err.status === 400) {
+        // handle error 400 dari server
+        if (err.response && err.response.data && err.response.data.error) {
+          setError(err.response.data.error);
+          return;
+        } else {
+          // error dari validasi client
+          setError(err.message);
+          return;
+        }
+      } else {
+        setError("Terjadi kesalahan pada server. Silakan coba lagi.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,6 +94,13 @@ export default function LoginPage() {
           <p className="text-gray-600">Silakan login untuk melanjutkan</p>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-400 rounded">
+            {error}
+          </div>
+        )}
+
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Username Field */}
@@ -81,7 +121,6 @@ export default function LoginPage() {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                required
                 className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors"
                 placeholder="Masukkan username"
               />
@@ -106,7 +145,6 @@ export default function LoginPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                required
                 className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors"
                 placeholder="Masukkan password"
               />
@@ -114,13 +152,17 @@ export default function LoginPage() {
           </div>
 
           {/* Login Button */}
-          <button
-            type="submit"
-            className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-cyan-500 to-cyan-600 text-white py-3 px-4 rounded-lg hover:from-cyan-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-all transform hover:scale-[1.02] font-semibold shadow-lg"
-          >
-            <FiLogIn className="w-5 h-5" />
-            Login
-          </button>
+          {loading ? (
+            <div className="text-center text-gray-500">Memproses login...</div>
+          ) : (
+            <button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-cyan-500 to-cyan-600 text-white py-3 px-4 rounded-lg hover:from-cyan-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-all transform hover:scale-[1.02] font-semibold shadow-lg"
+            >
+              <FiLogIn className="w-5 h-5" />
+              Login
+            </button>
+          )}
         </form>
 
         {/* Footer Info */}
