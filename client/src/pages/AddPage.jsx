@@ -36,7 +36,11 @@ export default function AddPage() {
         }
       }
 
-      await apiClient.post("/add-user", formData);
+      await apiClient.post("/add-user", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
       navigate("/");
     } catch (err) {
       console.log("🚀 ~ handleSubmit ~ err:", err);

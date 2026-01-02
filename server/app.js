@@ -7,6 +7,7 @@ const cors = require("cors");
 
 const UserController = require("./controllers/userController");
 const AuthController = require("./controllers/authController");
+const authentication = require("./middlewares/authentication");
 
 const app = express();
 
@@ -17,6 +18,9 @@ app.use(express.urlencoded({ extended: true }));
 // routes
 app.post("/api/register", AuthController.register);
 app.post("/api/login", AuthController.login);
+
+// authentication middleware
+app.use(authentication);
 
 // need authentication for all routes below
 app.get("/api/", UserController.getAllUsers);

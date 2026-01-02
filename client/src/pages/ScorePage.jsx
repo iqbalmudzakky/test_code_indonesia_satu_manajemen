@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { apiClient } from "../helpers/api";
+import Navbar from "../components/Navbar";
 
 export default function ScorePage() {
   const { noAplikasi } = useParams();
@@ -51,7 +52,11 @@ export default function ScorePage() {
       setLoading(true);
       setError(null);
       try {
-        const response = await apiClient.get(`/user/${noAplikasi}`);
+        const response = await apiClient.get(`/user/${noAplikasi}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
         setFormData(response.data.data);
       } catch (err) {
         console.log("🚀 ~ fetchUserData ~ err:", err);
@@ -95,10 +100,18 @@ export default function ScorePage() {
       }
 
       // update ke database
-      await apiClient.put(`/update-user/${noAplikasi}`, formData);
+      await apiClient.put(`/update-user/${noAplikasi}`, formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
 
       // refetch data user setelah update
-      const response = await apiClient.get(`/user/${noAplikasi}`);
+      const response = await apiClient.get(`/user/${noAplikasi}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
       setFormData(response.data.data);
     } catch (err) {
       console.log("🚀 ~ handleHitungSkor ~ err:", err);
@@ -168,8 +181,10 @@ export default function ScorePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+
+      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h1 className="text-3xl font-bold text-blue-600 mb-2">

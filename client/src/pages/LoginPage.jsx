@@ -58,6 +58,10 @@ export default function LoginPage() {
     }
   };
 
+  if (localStorage.getItem("authToken")) {
+    navigate("/");
+  }
+
   return (
     <div className="min-h-screen bg-linear-to-br from-cyan-400 via-cyan-500 to-cyan-600 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Decorative Stars */}

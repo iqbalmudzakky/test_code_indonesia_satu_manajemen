@@ -2,6 +2,8 @@ import { useNavigate } from "react-router";
 import { FiEdit2, FiTrash2, FiPlus, FiLogOut } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { apiClient } from "../helpers/api";
+import Navbar from "../components/Navbar";
+import Swal from "sweetalert2";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -19,6 +21,9 @@ export default function HomePage() {
       try {
         const response = await apiClient.get(`/`, {
           params: { page, limit },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
         });
         const data = response.data.data;
         setUsers(data);
@@ -39,13 +44,46 @@ export default function HomePage() {
     navigate(`/score/${noAplikasi}`);
   };
 
-  const handleDelete = (noAplikasi) => {
-    // Prototype - just show alert
-    alert(`Delete user dengan ID: ${noAplikasi}`);
-  };
+  const handleDelete = async (noAplikasi) => {
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data pengguna akan dihapus secara permanen.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
 
-  const handleLogout = () => {
-    navigate("/login");
+    if (result.isConfirmed) {
+      try {
+        setLoading(true);
+        await apiClient.delete(`/delete-user/${noAplikasi}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        // Refresh user list setelah dihapus
+        setUsers((prev) =>
+          prev.filter((user) => user.noAplikasi !== noAplikasi)
+        );
+        Swal.fire("Dihapus!", "Data pengguna telah dihapus.", "success");
+      } catch (err) {
+        console.log("🚀 ~ handleDelete ~ err:", err);
+        if (err.response && err.response.status === 404) {
+          Swal.fire("Gagal!", err.response.data.error, "error");
+        } else {
+          Swal.fire(
+            "Gagal!",
+            "Terjadi kesalahan pada server. Silakan coba lagi.",
+            "error"
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const getRiskLevelColor = (riskLevel) => {
@@ -64,28 +102,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-800">
-                Manajemen Scoring
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Admin</span>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <FiLogOut className="w-4 h-4" />
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
