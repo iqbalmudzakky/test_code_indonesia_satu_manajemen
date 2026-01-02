@@ -5,10 +5,16 @@ module.exports = class UserModel {
     return db.collection("users");
   }
 
-  static async getAllUsers() {
+  static async getAllUsers(limit, skip) {
     const collection = this.getCollection();
-    const users = await collection.find().toArray();
-    return users;
+    const users = await collection
+      .find()
+      .skip(Number(skip))
+      .limit(Number(limit))
+      .toArray();
+    const page = Math.floor(skip / limit) + 1;
+    const totalPages = Math.ceil((await collection.countDocuments()) / limit);
+    return { users, page, totalPages };
   }
 
   static async getUserByNama(nama) {

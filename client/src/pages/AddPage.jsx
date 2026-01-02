@@ -153,7 +153,7 @@ export default function AddPage() {
               Kode Pos
             </label>
             <input
-              type="text"
+              type="number"
               name="kodePos"
               value={formData.kodePos}
               onChange={handleChange}

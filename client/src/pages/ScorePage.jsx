@@ -125,6 +125,32 @@ export default function ScorePage() {
     navigate("/");
   };
 
+  const getRiskLevelColorBg = (riskLevel) => {
+    if (!riskLevel) return "";
+    switch (riskLevel) {
+      case "Low Risk":
+        return "bg-green-50 border-green-200";
+      case "Medium Risk":
+        return "bg-yellow-50 border-yellow-200";
+      case "High Risk":
+        return "bg-red-50 border-red-200";
+    }
+  };
+
+  const getRiskLevelColorText = (riskLevel) => {
+    if (!riskLevel) return "";
+    switch (riskLevel) {
+      case "Low Risk":
+        return "text-green-600";
+      case "Medium Risk":
+        return "text-yellow-600";
+      case "High Risk":
+        return "text-red-600";
+      default:
+        return "";
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -752,7 +778,7 @@ export default function ScorePage() {
                     </label>
                     <div className="bg-gray-100 px-4 py-3 rounded-md">
                       <span className="text-2xl font-bold text-gray-800">
-                        {formData.scoringResult.summaryScore}
+                        {formData.scoringResult.summaryScore.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -761,8 +787,16 @@ export default function ScorePage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Risk Level
                     </label>
-                    <div className="bg-red-100 px-4 py-3 rounded-md">
-                      <span className="text-xl font-bold text-red-700">
+                    <div
+                      className={`${getRiskLevelColorBg(
+                        formData.scoringResult.riskLevel
+                      )} px-4 py-3 rounded-md`}
+                    >
+                      <span
+                        className={`text-xl font-bold ${getRiskLevelColorText(
+                          formData.scoringResult.riskLevel
+                        )}`}
+                      >
                         {formData.scoringResult.riskLevel}
                       </span>
                     </div>

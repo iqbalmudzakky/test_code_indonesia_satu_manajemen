@@ -6,18 +6,23 @@ import { apiClient } from "../helpers/api";
 export default function HomePage() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (page = 1, limit = 5) => {
       setLoading(true);
       setError(null);
 
       try {
-        const response = await apiClient.get("/");
+        const response = await apiClient.get(`/`, {
+          params: { page, limit },
+        });
         const data = response.data.data;
         setUsers(data);
+        setTotalPages(response.data.totalPages);
       } catch (err) {
         console.log("🚀 ~ fetchData ~ err:", err);
         setError("Gagal memuat data pengguna.");
@@ -26,8 +31,8 @@ export default function HomePage() {
       }
     };
 
-    fetchData();
-  }, []);
+    fetchData(page, 5);
+  }, [page]);
 
   const handleEdit = (noAplikasi) => {
     // Navigate to score page with user id
@@ -164,7 +169,8 @@ export default function HomePage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {user.summaryScore || user.summaryScore === 0 ? (
                           <div className="text-sm font-semibold text-gray-900">
-                            {user.summaryScore}
+                            {/* dibulatkan jadi 1 angka dibelakang koma */}
+                            {user.summaryScore.toFixed(2)}
                           </div>
                         ) : (
                           <div className="text-sm text-gray-400">-</div>
@@ -208,6 +214,29 @@ export default function HomePage() {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              disabled={page === 1}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={page === totalPages}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         )}
 

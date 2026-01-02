@@ -9,11 +9,15 @@ const UserModel = require("../models/UserModel");
 
 module.exports = class UserController {
   static async getAllUsers(req, res) {
+    const { page, limit } = req.query;
     try {
-      const users = await UserModel.getAllUsers();
-      console.log("🚀 ~ getAllUsers ~ users:", users);
+      const skip = page && limit ? (Number(page) - 1) * Number(limit) : 0;
+      const result = await UserModel.getAllUsers(limit, skip);
+      console.log("🚀 ~ getAllUsers ~ users:", result.users);
       res.status(200).json({
-        data: users,
+        data: result.users,
+        page: result.page,
+        totalPages: result.totalPages,
       });
     } catch (err) {
       console.log("🚀 ~ getAllUsers ~ err:", err);
@@ -29,6 +33,7 @@ module.exports = class UserController {
       if (!user) {
         throw { status: 404, message: "User tidak ditemukan" };
       }
+      console.log("🚀 ~ getUserDetailByNoAplikasi ~ user:", user);
       res.status(200).json({
         data: user,
       });
@@ -66,6 +71,7 @@ module.exports = class UserController {
         noAplikasi
       );
 
+      console.log("🚀 ~ addUser ~ result:", "Berhasil menambahkan user");
       res.status(201).json({
         message: "Berhasil menambahkan user",
       });
@@ -225,6 +231,11 @@ module.exports = class UserController {
         noAplikasi,
         updateData
       );
+
+      console.log(
+        "🚀 ~ updateUserDetail ~ resUpdateUser:",
+        "Berhasil memperbarui data user"
+      );
       res.status(200).json({
         message: "Berhasil memperbarui data user",
       });
@@ -258,6 +269,10 @@ module.exports = class UserController {
       // delete user dari collection users
       const resDeleteUser = await UserModel.deleteUserByNoAplikasi(noAplikasi);
 
+      console.log(
+        "🚀 ~ deleteUser ~ resDeleteUser:",
+        "Berhasil menghapus user"
+      );
       res.status(200).json({
         message: "Berhasil menghapus user",
       });
