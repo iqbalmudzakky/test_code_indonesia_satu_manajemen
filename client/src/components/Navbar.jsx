@@ -1,11 +1,24 @@
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    navigate("/login");
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: "Yakin ingin logout?",
+      text: "Anda akan diarahkan ke halaman login.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, Logout",
+      cancelButtonText: "Batal",
+    });
+    if (result.isConfirmed) {
+      localStorage.removeItem("authToken");
+      navigate("/login");
+    }
   };
 
   return (

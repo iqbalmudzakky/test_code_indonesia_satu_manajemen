@@ -16,10 +16,10 @@ module.exports = function handleInfo6(
   // handle bobot F Appraisal
   let bobotFAppraisal = 0;
   switch (appraisal) {
-    case "Tidak Direkomendasikan%":
+    case "Tidak Direkomendasikan":
       bobotFAppraisal = 0;
       break;
-    case "Marketable%":
+    case "Marketable":
       bobotFAppraisal = 100;
       break;
   }

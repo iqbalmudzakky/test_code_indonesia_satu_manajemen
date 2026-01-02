@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { apiClient } from "../helpers/api";
 import Navbar from "../components/Navbar";
 import Swal from "sweetalert2";
+import Decorative from "../components/Decorative";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -101,13 +102,16 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-linear-to-br from-cyan-400 via-cyan-500 to-cyan-600 relative overflow-hidden">
+      {/* Decorative Elements */}
+      <Decorative />
+      {/* Navbar */}
       <Navbar />
-
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Header with Add Button */}
-        <div className="flex justify-between items-center mb-6">
+        {/* buat container ini agar memiliki bg putih */}
+        <div className="flex justify-between items-center mb-6 bg-white rounded-lg shadow-sm p-3">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
               Daftar Pengguna
@@ -127,9 +131,39 @@ export default function HomePage() {
 
         {/* Table */}
         {loading ? (
-          <div className="text-center py-10 text-gray-600">Memuat data...</div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+            <p className="text-gray-600 font-medium">Memuat data...</p>
+            <p className="text-gray-400 text-sm mt-1">Mohon tunggu sebentar</p>
+          </div>
         ) : error ? (
-          <div className="text-center py-10 text-red-600">{error}</div>
+          <div className="flex flex-col items-center justify-center py-16 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <svg
+                className="w-8 h-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <p className="text-red-600 font-semibold text-lg mb-1">
+              Terjadi Kesalahan
+            </p>
+            <p className="text-gray-500 text-sm mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+            >
+              Coba Lagi
+            </button>
+          </div>
         ) : users.length === 0 ? (
           <div className="text-center py-10 text-gray-600">
             Tidak ada data pengguna.
@@ -236,24 +270,73 @@ export default function HomePage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-4 mt-6">
-            <button
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              disabled={page === 1}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span className="text-sm text-gray-700">
-              Page {page} of {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={page === totalPages}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-            >
-              Next
-            </button>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4">
+            <p className="text-sm text-gray-600">
+              Menampilkan halaman{" "}
+              <span className="font-semibold text-gray-900">{page}</span> dari{" "}
+              <span className="font-semibold text-gray-900">{totalPages}</span>
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-all"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                Sebelumnya
+              </button>
+              <div className="hidden sm:flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      className={`w-10 h-10 text-sm font-medium rounded-lg transition-all ${
+                        page === pageNum
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                )}
+              </div>
+              <button
+                onClick={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={page === totalPages}
+                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 transition-all"
+              >
+                Selanjutnya
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
 

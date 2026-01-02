@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { apiClient } from "../helpers/api";
 import Navbar from "../components/Navbar";
+import Decorative from "../components/Decorative";
 
 export default function ScorePage() {
   const { noAplikasi } = useParams();
@@ -166,27 +167,70 @@ export default function ScorePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center py-10 text-gray-600">Memuat data...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center p-8">
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+          <p className="text-gray-700 font-semibold text-lg">
+            Memuat Data Scoring
+          </p>
+          <p className="text-gray-400 text-sm mt-2">Mohon tunggu sebentar...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center py-10 text-red-600">{error}</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg
+              className="w-10 h-10 text-red-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">
+            Terjadi Kesalahan
+          </h2>
+          <p className="text-gray-500 mb-6">{error}</p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => window.location.reload()}
+              className="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+            >
+              Coba Lagi
+            </button>
+            <button
+              onClick={() => navigate("/")}
+              className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            >
+              Kembali
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-linear-to-br from-cyan-400 via-cyan-500 to-cyan-600 relative overflow-hidden">
+      {/* Decorative Elements */}
+      <Decorative />
+      {/* Navbar */}
       <Navbar />
-
-      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 z-10 relative">
           <h1 className="text-3xl font-bold text-blue-600 mb-2">
             Scoring (DataRating)
           </h1>
@@ -754,10 +798,13 @@ export default function ScorePage() {
             {loadingScore ? (
               <button
                 type="button"
-                disabled
+                disabled={loadingScore}
                 className="bg-blue-400 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 shadow-md cursor-not-allowed"
               >
-                Memproses...
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Memproses...
+                </div>
               </button>
             ) : (
               <button
